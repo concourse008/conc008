@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+    canvas { 
+    border: 2px solid #000;
+    position:absolute;
+    top:0;
+    left:0; 
+    visibility: hidden; 
+    }
+    </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="main.css">
   <title>ミトダッシュ</title>
 </head>
 <body>
-  <canvas id="maincanvas" width="400" height="400"></canvas>
+  <canvas id="canvas1" width="400" height="400"></canvas>
+  <canvas id="canvas2" width="400" height="400"></canvas>
+  <canvas id="canvas0" width="400" height="400"></canvas>
 </body>
 <script src="move.js"></script>
 </html>
