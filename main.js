@@ -91,7 +91,9 @@ canvas[2].addEventListener('click',e =>{
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
   };
-  if (talk.choice0 == ''){
+  if (talk.next0 == 0){
+    startgame();
+  }else if (talk.choice0 == ''){
     talk = talk.next0;
   }else if(point.x >= 50 && point.x <= 170 && point.y >= 270&&point.y <= 390){
     talk = talk.next0;
@@ -127,7 +129,7 @@ let stone = new Trap('石に躓いてころんだ',10,2);
 let mos = new Trap('蛾をおっぱらった',5,1);
 
 //テキスト
-//表示される文面、左で進む、右で進む、左選択肢文、同じく右
+//表示される文面、左で進む、右で進む、左選択肢文、同じく右、左で減るアイテムID、減る量、増えるアイテムID、増える量、右で減るアイテムID、減る量、増えるアイテムID、増える量
 class Text{
   constructor(value,next0,next1,choice0,choice1){
     this.value = value;
@@ -138,8 +140,22 @@ class Text{
   }
 }
 
-let juce3 = new Text('「ガマンや！」\nやる気が 10 あがった！',0,0,'','');
-let juce2 = new Text('「おいしい！」\nおかねを 100 失った！\nやる気が 20 あがった！',0,0,'','');
+//イベント抽選
+let idol = new Text('行動中……',0,0,'','');
+function startgame(){
+  let i = Math.floor(Math.random()*events.length);
+  talk = events[i] ;
+}
+
+
+let juce3 = new Text('「ガマンや！」\nやる気が 10 あがった！',idol,0,'','');
+let juce2 = new Text('「おいしい！」\nおかねを 100 失った！\nやる気が 20 あがった！',idol,0,'','');
 let juce1 = new Text('自販機でジュースを買う？',juce3,juce2,'のまない','のむ');
 let juce0 = new Text('カエデは自動販売機を\n見つけた！',juce1,juce1,'','');
-talk = juce0;
+
+let mito1 = new Text('「ほんまに？ やったー！」\nやる気が 20 あがった！',idol,0,'','');
+let mito0 = new Text('カエデはミトと出会った！\n「カエデちゃんおつかいですか？\nえらいですねぇ……」',mito1,mito1,'','');
+
+const events = [juce0,mito0];
+
+talk = idol;
