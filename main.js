@@ -3,6 +3,7 @@ const game0Divided = document.getElementById('game-area0');
 const game1Divided = document.getElementById('game-area1');
 let talk = '初期';//これを表示する文字の格納先とする
 let nowID = 0;//現在のイベントidを記録する
+let status = [0,100,100,5];//ハズレ、元気、たいまつ、100円
 
 //画像読み込み
   const canvas = {
@@ -53,6 +54,10 @@ let nowID = 0;//現在のイベントidを記録する
     for(let j in images){
       ctx.drawImage(images[j],srcs[j][1],srcs[j][2]);
     }
+    //ステータスの表示
+    ctx.font = "16px sans-serif"
+    let sta = 'やるき：'+status[1]+'％　たいまつ：'+status[2]+'％　100円玉：'+status[3]+'枚';
+    ctx.fillText(sta,5,22)
     //文字の表示
     for (let lines= (String(talk.value)).split("\n"),i=0,l=lines.length;l>i;i++){
       ctx.font = "18px sans-serif";
@@ -61,22 +66,23 @@ let nowID = 0;//現在のイベントidを記録する
       if (i) addY += 18 * 1.16 * i ;
       ctx.fillText(line,50,190+addY);
     }
-    //選択肢左の表示
+    //選択肢の表示
+    if (talk instanceof Branch){
     for (let lines= (String(talk.choice0)).split("\n"),i=0,l=lines.length;l>i;i++){
-      ctx.font = "24px sans-serif";
+      ctx.font = "16px sans-serif";
       let line = lines[i];
       let addY = 18;
       if (i) addY += 18 * 1.16 * i ;
       ctx.fillText(line,30,290+addY);
     }
-    //右選択肢の表示
     for (let lines= (String(talk.choice1)).split("\n"),i=0,l=lines.length;l>i;i++){
-      ctx.font = "24px sans-serif";
+      ctx.font = "16px sans-serif";
       let line = lines[i];
       let addY = 18;
       if (i) addY += 18 * 1.16 * i ;
       ctx.fillText(line,230,290+addY);
     }
+  }
     //ほぼ60fpsで繰り返すそう、本当か？
     console.log('a');
   }
@@ -90,71 +96,67 @@ canvas[2].addEventListener('click',e =>{
   point = {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
-  };
+  }
+  if (talk instanceof Last){
+    status[talk.plusid] = status[talk.plusid] + talk.plusv;
+    status[talk.minusid] = status[talk.minusid] + talk.minusv;
+  }
   if (talk.next0 == 0){
     startgame();
-  }else if (talk.choice0 == ''){
+  }else if (talk instanceof Branch){
+    if(point.x >= 50 && point.x <= 170 && point.y >= 270&&point.y <= 390){
     talk = talk.next0;
-  }else if(point.x >= 50 && point.x <= 170 && point.y >= 270&&point.y <= 390){
-    talk = talk.next0;
-  } else if(point.x >= 230 && point.x <= 350 && point.y >= 270&&point.y <= 390){
+    } else if(point.x >= 230 && point.x <= 350 && point.y >= 270&&point.y <= 390){
     talk = talk.next1;
+    }
+  }else{
+    talk = talk.next0;
   }
 })
 //クリック
 
-//0体力　1たいまつ　2お金
-let status = ['やる気に','松明を','お金を']
-let statusdam = ['ダメージを受けた。','使った。','円なくした。']
-
-//バッドイベント
-class Trap{
-  constructor(name,damage,damagetype){
-    this.name = name ;
-    this.damage = damage ;
-    this.damagetype = status[damagetype] ;
-    this.damagelog = statusdam[damagetype];
-  }
-  badresult(){
-    let i = this.name + '！<br>カエデは' + this.damagetype + this.damage + this.damagelog;
-    playlog(i);
-  }
-  goodresult(){
-    
-  }
-}
-
-let crow = new Trap('カラスに馬鹿にされた',10,0);
-let stone = new Trap('石に躓いてころんだ',10,2);
-let mos = new Trap('蛾をおっぱらった',5,1);
-
-//テキスト
-//表示される文面、左で進む、右で進む、左選択肢文、同じく右、左で減るアイテムID、減る量、増えるアイテムID、増える量、右で減るアイテムID、減る量、増えるアイテムID、増える量
+//テキストのみ
 class Text{
-  constructor(value,next0,next1,choice0,choice1){
+  constructor(value,next0){
     this.value = value;
     this.next0 = next0;
+  }
+}
+//選択肢あり
+class Branch extends Text{
+  constructor(value,next0,next1,choice0,choice1){
+    super(value,next0);
     this.next1 = next1;
     this.choice0 = choice0;
     this.choice1 = choice1;
   }
 }
+//ステータス処理あり
+class Last extends Text{
+  constructor(value,next0,plusid,plusv,minusid,minusv){
+    super(value,next0);
+    this.plusid = plusid;
+    this.plusv = plusv;
+    this.minusid = minusid;
+    this.minusv = minusv;
+  }
+}
 
 //イベント抽選
-let idol = new Text('行動中……',0,0,'','');
+let idol = new Text('行動中……',0);
 function startgame(){
   let i = Math.floor(Math.random()*events.length);
+  status[2] = status[2] -10;
   talk = events[i] ;
 }
 
+let juce3 = new Last('「ガマンや！」\nやる気が 10 あがった！',idol,1,10,0,0);
+let juce2 = new Last('「おいしい！」\n100円を 1 失った！\nやる気が 20 あがった！',idol,1,20,3,-1);
+let juce1 = new Branch('自販機でジュースを買う？',juce3,juce2,'のまない','のむ');
+let juce0 = new Text('カエデは自動販売機を\n見つけた！',juce1);
 
-let juce3 = new Text('「ガマンや！」\nやる気が 10 あがった！',idol,0,'','');
-let juce2 = new Text('「おいしい！」\nおかねを 100 失った！\nやる気が 20 あがった！',idol,0,'','');
-let juce1 = new Text('自販機でジュースを買う？',juce3,juce2,'のまない','のむ');
-let juce0 = new Text('カエデは自動販売機を\n見つけた！',juce1,juce1,'','');
-
-let mito1 = new Text('「ほんまに？ やったー！」\nやる気が 20 あがった！',idol,0,'','');
-let mito0 = new Text('カエデはミトと出会った！\n「カエデちゃんおつかいですか？\nえらいですねぇ……」',mito1,mito1,'','');
+let mito1 = new Last('「ほんまに？ やったー！」\nやる気が 20 あがった！',idol,1,20,0,0);
+let mito0 = new Text('カエデはミトと出会った！\n「カエデちゃんおつかいですか？\nえらいですねぇ……」',mito1);
 
 const events = [juce0,mito0];
 
