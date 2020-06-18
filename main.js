@@ -131,11 +131,11 @@ canvas[2].addEventListener('click', e => {
     status[talk.minusid] = status[talk.minusid] - talk.minusv;
   }
   if (talk instanceof Branch) {
+    inputok = false;
     branchdo();
-    inputok = false;
   } else if (talk instanceof Menu) {
-    menudo();
     inputok = false;
+    menudo();
   } else {
     talk = talk.next0;
   }
@@ -203,8 +203,10 @@ function menudo(){
     rightgo = setInterval(right, 1000/30);
   }else if (point.x >= 10 && point.x <= 195 && point.y >= 333 && point.y <= 390) {
     console.log('2');
+    inputok = true;
   }else if (point.x >= 205 && point.x <= 390 && point.y >= 333 && point.y <= 390) {
     console.log('3');
+    inputok = true;
   }
 }
 function right(){
