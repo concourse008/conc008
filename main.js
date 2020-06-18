@@ -4,6 +4,7 @@ const game1Divided = document.getElementById('game-area1');
 let talk = '初期';  //表示するイベントを格納
 let place = 0;     //現在の場所を記録
 let flag = [];      //初回のみのイベントのフラグをまとめる
+let inputok = true; //入力受付中
 
 let mitokae = {
   x: 160,
@@ -118,6 +119,7 @@ function step() {
 //クリック
 let point = 0;
 canvas[2].addEventListener('click', e => {
+  if (inputok){
   //マウスの座標をカンバス内の座標と合わせる
   const rect = canvas[2].getBoundingClientRect();
   point = {
@@ -130,10 +132,13 @@ canvas[2].addEventListener('click', e => {
   }
   if (talk instanceof Branch) {
     branchdo();
+    inputok = false;
   } else if (talk instanceof Menu) {
     menudo();
+    inputok = false;
   } else {
     talk = talk.next0;
+  }
   }
 })
 //クリック
@@ -208,6 +213,7 @@ function right(){
   if (nowbi == 0){
     clearInterval(rightgo);
     clearInterval(jumping);
+    inputok = true;
   }
 }
 function left(){
@@ -216,6 +222,7 @@ function left(){
   if (nowbi == 0){
     clearInterval(leftgo);
     clearInterval(jumping);
+    inputok = true;
   }
 }
 //ステータス処理あり
