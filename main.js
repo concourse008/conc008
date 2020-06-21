@@ -150,6 +150,9 @@ canvas[2].addEventListener('click', e => {
         talk = talk.next0;
       } else {
         talk = lo[place];
+        if (talk instanceof Check){
+          checkdo();
+        }
       }
       count = 0;//メッセージウィンドウをリセット
       disp();//メッセージ表示
@@ -288,6 +291,9 @@ function left() {
 }
 function look() {
   talk = lo[place];
+  if (talk instanceof Check){
+    checkdo();
+  }
   count = 0;
   disp();
 }
